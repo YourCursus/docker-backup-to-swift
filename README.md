@@ -42,6 +42,7 @@ $ docker run -d [OPTIONS] yourcursus/pg_dump-to-swift
 
 * `-e 'CRON_SCHEDULE=0 1 * * *'`: specifies when cron job starts ([details](http://en.wikipedia.org/wiki/Cron)). Default is `0 1 * * *` (runs every day at 1:00 am).
 * `no-cron`: run container once and exit (no cron scheduling).
+* `delete`: delete the OpenStack Swift container and exit (no cron scheduling).
 
 ## Examples:
 
