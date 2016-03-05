@@ -1,4 +1,4 @@
-FROM postgres:9.1
+FROM postgres:9.2
 MAINTAINER Guillaume Hain <zedtux@zedroot.org>
 
 ENV SWIFT_OS_AUTH_URL 'https://auth.cloud.ovh.net/v2.0'
