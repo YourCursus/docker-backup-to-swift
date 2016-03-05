@@ -46,7 +46,7 @@ fi
 if [[ "$1" == 'no-cron' ]]; then
   exec "$PG2SWIFT_JOB_PATH"
 elif [[ "$1" == 'delete' ]]; then
-  exec /usr/local/bin/s3cmd del -r "$S3_PATH"
+  $SWIFT_CMD delete $OS_CONTAINER_NAME
 else
   LOGFIFO='/var/log/cron.fifo'
   if [[ ! -e "$LOGFIFO" ]]; then
