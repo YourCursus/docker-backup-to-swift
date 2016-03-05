@@ -47,10 +47,8 @@ elif [[ "$1" == 'delete' ]]; then
   $SWIFT_CMD delete $OS_CONTAINER_NAME
 else
   LOGFIFO='/var/log/cron.fifo'
-  if [[ ! -e "$LOGFIFO" ]]; then
-    mkfifo "$LOGFIFO"
-  fi
-  echo -e "$CRON_SCHEDULE $PG2SWIFT_JOB_PATH > $LOGFIFO 2>&1" | crontab -
+  [[ ! -e "$LOGFIFO" ]] && mkfifo "$LOGFIFO"
+  echo -e "`env`\n$CRON_SCHEDULE $PG2SWIFT_JOB_PATH > $LOGFIFO 2>&1" | crontab -
   crontab -l
   cron
   tail -f "$LOGFIFO"
