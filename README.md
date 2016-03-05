@@ -18,7 +18,7 @@ In case you're using the docker postgres image with the tag `9.1`, you would
 have to use the following:
 
 ```
-$ docker run --rm ... yourcursus/pg_dump-to-swift:9.1
+$ docker run --rm ... yourcursus/docker-pg_dump-to-swift:9.1
 ```
 
 Some for version `9.2`, `9.3` and so on.
@@ -26,7 +26,7 @@ Some for version `9.2`, `9.3` and so on.
 ## Usage
 
 ```
-$ docker run -d [OPTIONS] yourcursus/pg_dump-to-swift
+$ docker run -d [OPTIONS] yourcursus/docker-pg_dump-to-swift
 ```
 
 ## Parameters:
@@ -57,7 +57,7 @@ $ docker run -d \
     -e PGDATABASE=my_app_production \
     -e 'CRON_SCHEDULE=0 12 * * *' \
     --link your-db-container-name:postgres
-    yourcursus/pg_dump-to-swift
+    yourcursus/docker-pg_dump-to-swift
 ```
 
 Run once then delete the container:
@@ -70,7 +70,7 @@ $ docker run --rm \
     -e OS_REGION=GRA1 \
     -e PGDATABASE=my_app_production \
     --link your-db-container-name:postgres
-    yourcursus/pg_dump-to-swift no-cron
+    yourcursus/docker-pg_dump-to-swift no-cron
 ```
 
 Run once to delete from s3 then delete the container:
@@ -83,5 +83,5 @@ $ docker run --rm \
     -e OS_REGION=GRA1 \
     -e PGDATABASE=my_app_production \
     --link your-db-container-name:postgres
-    yourcursus/pg_dump-to-swift delete
+    yourcursus/docker-pg_dump-to-swift delete
 ```
