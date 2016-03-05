@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Mandatory variables
+OS_TENANT_NAME=${OS_TENANT_NAME:?"OS_TENANT_NAME env variable is required"}
+OS_USERNAME=${OS_USERNAME:?"OS_USERNAME env variable is required"}
+OS_PASSWORD=${OS_PASSWORD:?"OS_PASSWORD env variable is required"}
+OS_REGION=${OS_REGION:?"OS_REGION env variable is required"}
+OS_CONTAINER_NAME=${OS_CONTAINER_NAME:?"OS_CONTAINER_NAME env variable is required"}
+PGDATABASE=${PGDATABASE:?"PGDATABASE env variable is required"}
+
+if [[ -z "$POSTGRES_PORT_5432_TCP_ADDR" ]]
+then
+  echo "ERROR: You must link a PostgreSQL container instance and name it 'postgres'."
+  echo "Have a look at README.md file."
+  exit 1
+fi
+
+# Optional variables
+DATA_PATH=${DATA_PATH:-/data/}
+CRON_SCHEDULE=${CRON_SCHEDULE:-0 1 * * *}
+PARAMS=${PARAMS}
+PG2SWIFT_JOB_PATH="/usr/local/bin/pg2swift-job"
+
+# Find or create the given container name
+source /usr/local/bin/pg2swift-build-swift-env
+
+SWIFT_CONTAINERS=`$SWIFT_CMD list`
+if [[ $SWIFT_CONTAINERS != *"$OS_CONTAINER_NAME" ]]
+then
+  echo "Container $OS_CONTAINER_NAME not found. Creating it ..."
+  $SWIFT_CMD post $OS_CONTAINER_NAME
+
+  echo "Checking container has been well created ..."
+  SWIFT_CONTAINERS=`$SWIFT_CMD list`
+  if [[ $SWIFT_CONTAINERS != *"$OS_CONTAINER_NAME" ]]
+  then
+    echo "ERROR: The OpenStack swift container wasn't created correctly."
+    exit 1
+  else
+    echo "SUCCESS: Container well created."
+  fi
+fi
+
+if [[ "$1" == 'no-cron' ]]; then
+  exec "$PG2SWIFT_JOB_PATH"
+elif [[ "$1" == 'delete' ]]; then
+  exec /usr/local/bin/s3cmd del -r "$S3_PATH"
+else
+  LOGFIFO='/var/log/cron.fifo'
+  if [[ ! -e "$LOGFIFO" ]]; then
+    mkfifo "$LOGFIFO"
+  fi
+  CRON_ENV="PARAMS='$PARAMS'"
+  CRON_ENV="$CRON_ENV\nDATA_PATH='$DATA_PATH'"
+  CRON_ENV="$CRON_ENV\nS3_PATH='$S3_PATH'"
+  echo -e "$CRON_ENV\n$CRON_SCHEDULE $PG2SWIFT_JOB_PATH > $LOGFIFO 2>&1" | crontab -
+  crontab -l
+  cron
+  tail -f "$LOGFIFO"
+fi

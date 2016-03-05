@@ -1,19 +1,17 @@
-FROM debian:jessie
-MAINTAINER Ilya Stepanov <dev@ilyastepanov.com>
+FROM postgres:9.1
+MAINTAINER Guillaume Hain <zedtux@zedroot.org>
+
+ENV SWIFT_OS_AUTH_URL https://auth.cloud.ovh.net/v2.0
 
 RUN apt-get update && \
-    apt-get install -y python python-pip cron && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y python-swiftclient cron && \
+    rm -rf /var/lib/apt/lists/* && \
+    useradd -ms /bin/bash pg2swift
 
-RUN pip install s3cmd
+ADD pg2swift-start pg2swift-job pg2swift-build-swift-env /usr/local/bin/
+RUN chmod +x /usr/local/bin/pg2swift-start \
+  /usr/local/bin/pg2swift-job \
+  /usr/local/bin/pg2swift-build-swift-env
 
-ADD s3cfg /root/.s3cfg
-
-ADD start.sh /start.sh
-RUN chmod +x /start.sh
-
-ADD sync.sh /sync.sh
-RUN chmod +x /sync.sh
-
-ENTRYPOINT ["/start.sh"]
-CMD [""]
+USER pg2swift
+ENTRYPOINT ["pg2swift-start"]
