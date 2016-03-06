@@ -24,16 +24,30 @@ PG2SWIFT_JOB_PATH="/usr/local/bin/pg2swift-job"
 # Find or create the given container name
 source /usr/local/bin/pg2swift-build-swift-env
 
+CONTAINER_EXISTS=0
 SWIFT_CONTAINERS=`$SWIFT_CMD list`
-if [[ $SWIFT_CONTAINERS != *"$OS_CONTAINER_NAME" ]]
-then
+for container in $SWIFT_CONTAINERS; do
+  if [[ "$container" == "$OS_CONTAINER_NAME" ]]
+  then
+    CONTAINER_EXISTS=1
+  fi
+done
+
+if [[ $CONTAINER_EXISTS == 0 ]]; then
   echo "Container $OS_CONTAINER_NAME not found. Creating it ..."
   $SWIFT_CMD post $OS_CONTAINER_NAME
 
   echo "Checking container has been well created ..."
   SWIFT_CONTAINERS=`$SWIFT_CMD list`
-  if [[ $SWIFT_CONTAINERS != *"$OS_CONTAINER_NAME" ]]
-  then
+  CONTAINER_EXISTS=0
+  SWIFT_CONTAINERS=`$SWIFT_CMD list`
+  for container in $SWIFT_CONTAINERS; do
+    if [[ "$container" == "$OS_CONTAINER_NAME" ]]
+    then
+      CONTAINER_EXISTS=1
+    fi
+  done
+  if [[ $CONTAINER_EXISTS == 0 ]]; then
     echo "ERROR: The OpenStack swift container wasn't created correctly."
     exit 1
   else
