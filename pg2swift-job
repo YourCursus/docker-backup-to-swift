@@ -14,13 +14,13 @@ echo "Dumping $PGDATABASE from $POSTGRES_PORT_5432_TCP_ADDR:$POSTGRES_PORT_5432_
 
 # pg_dump will dump the database content
 # -Z$PG_DUMP_COMPRESSION compression level (higer you compress, longer the dump will take)
-# -Fc use the custom format
 # --host Linked PostgreSQL Docker container address
 # --port Linked PostgreSQL Docker container port
 # --username used to connect to PostgreSQL
 #
 # No database variable given as PostgreSQL uses PGDATABASE as default one.
-pg_dump -Z$PG_DUMP_COMPRESSION -Fc --host=$POSTGRES_PORT_5432_TCP_ADDR \
+pg_dump -Z$PG_DUMP_COMPRESSION \
+  --host=$POSTGRES_PORT_5432_TCP_ADDR \
   --port=$POSTGRES_PORT_5432_TCP_PORT \
   --username=postgres > $DUMP_OUTPUT_PATH
 
