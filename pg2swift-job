@@ -8,17 +8,19 @@ source /usr/local/bin/pg2swift-build-swift-env
 
 DUMP_OUTPUT_PATH="/tmp/$(date +"%Y%m%d-%H%M%S").sql"
 
-echo "Dumping $PGDATABASE from $POSTGRES_PORT_5432_TCP_ADDR:$POSTGRES_PORT_5432_TCP_PORT to $DUMP_OUTPUT_PATH"
+[[ -z "$PG_DUMP_COMPRESSION" ]] && PG_DUMP_COMPRESSION=2
+
+echo "Dumping $PGDATABASE from $POSTGRES_PORT_5432_TCP_ADDR:$POSTGRES_PORT_5432_TCP_PORT to $DUMP_OUTPUT_PATH with compression level $PG_DUMP_COMPRESSION"
 
 # pg_dump will dump the database content
-# -Z2 compression level set to 2 (higer you compress, longer the dump will take)
+# -Z$PG_DUMP_COMPRESSION compression level (higer you compress, longer the dump will take)
 # -Fc use the custom format
 # --host Linked PostgreSQL Docker container address
 # --port Linked PostgreSQL Docker container port
 # --username used to connect to PostgreSQL
 #
 # No database variable given as PostgreSQL uses PGDATABASE as default one.
-pg_dump -Z2 -Fc --host=$POSTGRES_PORT_5432_TCP_ADDR \
+pg_dump -Z$PG_DUMP_COMPRESSION -Fc --host=$POSTGRES_PORT_5432_TCP_ADDR \
   --port=$POSTGRES_PORT_5432_TCP_PORT \
   --username=postgres > $DUMP_OUTPUT_PATH
 
