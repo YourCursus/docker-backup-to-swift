@@ -73,7 +73,7 @@ $ docker run --rm \
     yourcursus/docker-pg_dump-to-swift no-cron
 ```
 
-Run once to delete from s3 then delete the container:
+Run once to delete from swift then delete the container:
 
 ```
 $ docker run --rm \
