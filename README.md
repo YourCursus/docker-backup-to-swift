@@ -60,7 +60,7 @@ $ docker run -d \
     yourcursus/docker-pg_dump-to-swift
 ```
 
-Run once then delete the container:
+Backup the linked PostgreSQL to OpenStack swift then delete the container:
 
 ```
 $ docker run --rm \
@@ -84,4 +84,18 @@ $ docker run --rm \
     -e PGDATABASE=my_app_production \
     --link your-db-container-name:postgres
     yourcursus/docker-pg_dump-to-swift delete
+```
+
+Restore the linked PostgreSQL using the last file from OpenStack swift then
+delete the container:
+
+```
+$ docker run --rm \
+    -e OS_TENANT_NAME=1122334455667788 \
+    -e OS_USERNAME=rHcbN0pNtTyP \
+    -e OS_PASSWORD=zfnZzTkxKZ8w6cYYAyKWDgXRzuU7ErTC \
+    -e OS_REGION=GRA1 \
+    -e PGDATABASE=my_app_production \
+    --link your-db-container-name:postgres
+    yourcursus/docker-pg_dump-to-swift restorelast
 ```
