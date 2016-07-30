@@ -19,7 +19,8 @@ fi
 
 # Optional variables
 CRON_SCHEDULE=${CRON_SCHEDULE:-0 1 * * *}
-PG2SWIFT_JOB_PATH="/usr/local/bin/pg2swift-job"
+PG2SWIFT_BACKUP_JOB_PATH="/usr/local/bin/pg2swift-backup-job"
+PG2SWIFT_RESTORE_JOB_PATH="/usr/local/bin/pg2swift-restore-job"
 
 # Find or create the given container name
 source /usr/local/bin/pg2swift-build-swift-env
@@ -56,13 +57,15 @@ if [[ $CONTAINER_EXISTS == 0 ]]; then
 fi
 
 if [[ "$1" == 'no-cron' ]]; then
-  exec "$PG2SWIFT_JOB_PATH"
+  exec "$PG2SWIFT_BACKUP_JOB_PATH"
 elif [[ "$1" == 'delete' ]]; then
   $SWIFT_CMD delete $OS_CONTAINER_NAME
+elif [[ "$1" == 'restorelast' ]]; then
+  exec "$PG2SWIFT_RESTORE_JOB_PATH"
 else
   LOGFIFO='/var/log/cron.fifo'
   [[ ! -e "$LOGFIFO" ]] && mkfifo "$LOGFIFO"
-  echo -e "`env`\n$CRON_SCHEDULE $PG2SWIFT_JOB_PATH > $LOGFIFO 2>&1" | crontab -
+  echo -e "`env`\n$CRON_SCHEDULE $PG2SWIFT_BACKUP_JOB_PATH > $LOGFIFO 2>&1" | crontab -
   crontab -l
   cron
   tail -f "$LOGFIFO"
