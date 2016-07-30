@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Job started: $(date)"
+echo "Backup Job started: $(date)"
 
 source /usr/local/bin/pg2swift-build-swift-env
 
@@ -30,4 +30,4 @@ $SWIFT_CMD upload $OS_CONTAINER_NAME "$DUMP_OUTPUT_PATH"
 
 rm "$DUMP_OUTPUT_PATH"
 
-echo "Job finished: $(date)"
+echo "Backup Job finished: $(date)"

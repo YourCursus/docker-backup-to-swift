@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo "Restore Job started: $(date)"
+
+source /usr/local/bin/pg2swift-build-swift-env
+
+BACKUP_FILENAME=`$SWIFT_CMD list $OS_CONTAINER_NAME | tail -n 1`
+echo "Restauring $PGDATABASE on $POSTGRES_PORT_5432_TCP_ADDR:$POSTGRES_PORT_5432_TCP_PORT using the file $BACKUP_FILENAME ..."
+
+$SWIFT_CMD download $OS_CONTAINER_NAME "$BACKUP_FILENAME"
+zcat "/$BACKUP_FILENAME" > "/$BACKUP_FILENAME.sql"
+
+echo "Re-creating $PGDATABASE database ..."
+dropdb --host=$POSTGRES_PORT_5432_TCP_ADDR \
+  --port=$POSTGRES_PORT_5432_TCP_PORT \
+  --username=postgres \
+  "$PGDATABASE"
+createdb --host=$POSTGRES_PORT_5432_TCP_ADDR \
+  --port=$POSTGRES_PORT_5432_TCP_PORT \
+  --username=postgres \
+  "$PGDATABASE"
+
+# psql will import a dump file into the given database
+# --host Linked PostgreSQL Docker container address
+# --port Linked PostgreSQL Docker container port
+# --username used to connect to PostgreSQL
+#
+# No database variable given as PostgreSQL uses PGDATABASE as default one.
+echo "Importing dump file ..."
+psql --host=$POSTGRES_PORT_5432_TCP_ADDR \
+  --port=$POSTGRES_PORT_5432_TCP_PORT \
+  --username=postgres \
+  -f "/$BACKUP_FILENAME.sql"
+
+rm "$BACKUP_FILENAME*"
+
+echo "Restore Job finished: $(date)"
