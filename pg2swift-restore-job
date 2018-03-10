@@ -16,6 +16,7 @@ echo "Re-creating $PGDATABASE database ..."
 dropdb --host=$POSTGRES_PORT_5432_TCP_ADDR \
   --port=$POSTGRES_PORT_5432_TCP_PORT \
   --username=postgres \
+  --if-exists \
   "$PGDATABASE"
 createdb --host=$POSTGRES_PORT_5432_TCP_ADDR \
   --port=$POSTGRES_PORT_5432_TCP_PORT \
