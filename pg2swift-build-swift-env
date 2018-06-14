@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-SWIFT_CMD="`which swift` --os-auth-url $SWIFT_OS_AUTH_URL \
-  --os-tenant-name $OS_TENANT_NAME \
-  --os-username $OS_USERNAME \
-  --os-password $OS_PASSWORD \
-  --os-region-name $OS_REGION"
